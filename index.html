@@ -28,6 +28,8 @@
             --text-secondary: #b2c9e0;
             --snow-white: #f0f8ff;
             --frost: rgba(255, 255, 255, 0.1);
+            --warning-orange: #ff9800;
+            --danger-red: #f44336;
         }
 
         body {
@@ -60,7 +62,6 @@
             50% { opacity: 0.8; }
         }
 
-        /* Animated snowflakes */
         body::after {
             content: '';
             position: fixed;
@@ -97,10 +98,74 @@
             z-index: 1;
         }
 
+        /* PWA Install Banner */
+        .install-banner {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.3);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .install-banner.show {
+            display: flex;
+        }
+
+        .install-banner-text {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .install-banner-icon {
+            font-size: 1.8rem;
+        }
+
+        .install-banner-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 3px;
+        }
+
+        .install-banner-content p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .install-btn {
+            background: white;
+            color: var(--accent-blue);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .install-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .close-banner {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
         header {
             text-align: center;
             margin-bottom: 40px;
-            padding: 40px 20px;
+            padding: 40px 20px 20px;
             animation: slideDown 0.8s ease-out;
         }
 
@@ -133,7 +198,7 @@
         .resort-card {
             background: var(--bg-card);
             border-radius: 20px;
-            padding: 30px;
+            padding: 0;
             position: relative;
             overflow: hidden;
             backdrop-filter: blur(10px);
@@ -169,6 +234,19 @@
             border-color: var(--accent-cyan);
         }
 
+        .resort-header {
+            padding: 30px 30px 20px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .resort-header-content {
+            flex: 1;
+        }
+
         .resort-name {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 2rem;
@@ -180,8 +258,89 @@
         .resort-location {
             font-size: 0.9rem;
             color: var(--text-secondary);
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             font-weight: 300;
+        }
+
+        .toggle-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+            color: var(--accent-cyan);
+        }
+
+        .resort-card.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .resort-content {
+            padding: 0 30px 30px;
+            max-height: 3000px;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.3s ease;
+        }
+
+        .resort-card.collapsed .resort-content {
+            max-height: 0;
+            opacity: 0;
+            padding: 0 30px;
+        }
+
+        .weather-alert {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.2), rgba(244, 67, 54, 0.2));
+            border: 2px solid var(--warning-orange);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .weather-alert.cold {
+            border-color: var(--accent-cyan);
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(51, 153, 255, 0.15));
+        }
+
+        .alert-icon {
+            font-size: 1.8rem;
+        }
+
+        .alert-text h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: var(--snow-white);
+        }
+
+        .alert-text p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
         }
 
         .loading {
@@ -316,89 +475,73 @@
             margin-top: 5px;
         }
 
-        .piste-map-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
-            color: white;
-            padding: 12px 24px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            margin-top: 15px;
-            margin-right: 10px;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
+        .forecast-sun {
+            font-size: 0.7rem;
+            color: #ffd700;
+            margin-top: 3px;
         }
 
-        .piste-map-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.3);
+        .forecast-uv {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
         }
 
-        .webcam-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .webcam-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(238, 90, 111, 0.4);
-        }
-
-        .piste-map-section {
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
             margin-top: 20px;
-            text-align: center;
             padding-top: 20px;
             border-top: 1px solid var(--frost);
         }
 
-        .last-snowfall {
-            background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(51, 153, 255, 0.15));
-            border: 1px solid rgba(0, 229, 255, 0.3);
-            padding: 15px;
-            border-radius: 12px;
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        .last-snowfall-label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .last-snowfall-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--accent-cyan);
-        }
-
-        .last-snowfall-date {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-top: 5px;
-            font-weight: 300;
-        }
-
-        .error {
-            background: rgba(255, 82, 82, 0.1);
-            border: 1px solid rgba(255, 82, 82, 0.3);
-            padding: 15px;
-            border-radius: 12px;
-            color: #ffb4b4;
+        .btn {
+            flex: 1;
+            min-width: 140px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
             font-size: 0.95rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(238, 90, 111, 0.4);
+        }
+
+        .btn-tertiary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-tertiary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
         }
 
         .last-update {
@@ -409,6 +552,17 @@
             font-weight: 300;
         }
 
+        .data-disclaimer {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid rgba(255, 152, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
         footer {
             text-align: center;
             padding: 40px 20px;
@@ -416,6 +570,15 @@
             font-size: 0.9rem;
             border-top: 1px solid var(--frost);
             margin-top: 40px;
+        }
+
+        .error {
+            background: rgba(255, 82, 82, 0.1);
+            border: 1px solid rgba(255, 82, 82, 0.3);
+            padding: 15px;
+            border-radius: 12px;
+            color: #ffb4b4;
+            font-size: 0.95rem;
         }
 
         @keyframes slideDown {
@@ -452,11 +615,39 @@
             .weather-grid {
                 grid-template-columns: 1fr;
             }
+
+            .forecast-grid {
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            }
+
+            .install-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .install-banner-text {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- PWA Install Banner -->
+        <div class="install-banner" id="installBanner">
+            <div class="install-banner-text">
+                <span class="install-banner-icon">📱</span>
+                <div class="install-banner-content">
+                    <h3>Installeer als app</h3>
+                    <p>Voeg toe aan je startscherm voor snelle toegang</p>
+                </div>
+            </div>
+            <div>
+                <button class="install-btn" id="installBtn">Installeer</button>
+                <button class="close-banner" id="closeBanner">✕</button>
+            </div>
+        </div>
+
         <header>
             <h1>⛷️ SKI CONDITIONS</h1>
             <p class="subtitle">Actuele condities voor jouw 3 favoriete skigebieden</p>
@@ -469,10 +660,22 @@
             </div>
         </div>
 
+        <div class="data-disclaimer">
+            ⚠️ <strong>Belangrijke informatie over data-nauwkeurigheid:</strong><br><br>
+            
+            <strong>Weerdata (temperatuur, wind, UV):</strong> Accurate voorspellingen van Open-Meteo API ✅<br>
+            
+            <strong>Sneeuwdiepte & liften:</strong> Dit zijn SCHATTINGEN gebaseerd op weervoorspellingen. Voor actuele sneeuwdieptes en geopende liften, klik op de "Officiële Website" knop per gebied. ⚠️<br><br>
+            
+            <em>Waarom geen real-time data?</em> Skigebieden publiceren hun data niet via gratis APIs. Voor 100% accurate sneeuw- en liftdata moet je altijd de officiële website van het skigebied checken.<br><br>
+            
+            Data wordt elke 15 minuten automatisch ververst.
+        </div>
+
         <div class="last-update" id="lastUpdate"></div>
 
         <footer>
-            <p>Data wordt automatisch ververst • Gemaakt voor ski-liefhebbers</p>
+            <p>Data wordt automatisch ververst elke 15 minuten • Gemaakt voor ski-liefhebbers</p>
         </footer>
     </div>
 
@@ -482,44 +685,78 @@
                 name: 'Bergeralm',
                 location: 'Steinach am Brenner, Oostenrijk',
                 coords: { lat: 47.0858, lon: 11.4650 },
-                pisteMapUrl: 'https://www.bergeralm.net/en/slopes-and-more/',
-                webcamUrl: 'https://www.foto-webcam.eu/webcam/bergeralm/'
+                elevation: 1800,
+                pisteMapUrl: 'https://www.bergfex.com/bergeralm/panorama/',
+                webcamUrl: 'https://www.bergeralm.net/en/webcam/',
+                officialUrl: 'https://www.bergeralm.net/en/',
+                mapsUrl: 'https://www.google.com/maps/dir//Bergeralm,+6150+Steinach+am+Brenner,+Austria/@47.0858,11.4650,15z'
             },
             {
                 name: 'Ladurns',
                 location: 'Zuid-Tirol, Italië',
                 coords: { lat: 46.8833, lon: 11.4500 },
-                pisteMapUrl: 'https://www.ladurns.it/media/files/downloads/Ladurns_Winter_Druck_klein_1.pdf',
-                webcamUrl: 'https://www.ladurns.it/nl/winter/webcam'
+                elevation: 1900,
+                pisteMapUrl: 'https://www.bergfex.com/ladurns-gossensass-pflerschtal/panorama/',
+                webcamUrl: 'https://www.ladurns.it/en/services/webcams',
+                officialUrl: 'https://www.ladurns.it/en/',
+                mapsUrl: 'https://www.google.com/maps/dir//Ladurns,+Italy/@46.8833,11.4500,15z'
             },
             {
                 name: 'Superdévoluy',
                 location: 'Hautes-Alpes, Frankrijk',
                 coords: { lat: 44.6833, lon: 6.0167 },
+                elevation: 1850,
                 pisteMapUrl: 'https://www.ledevoluy.com/winter/skiing-and-snowboarding/trail-map/',
-                webcamUrl: 'https://www.ledevoluy.com/practical-information/webcams/'
+                webcamUrl: 'https://www.ledevoluy.com/winter/live/webcams/',
+                officialUrl: 'https://www.ledevoluy.com/en/',
+                mapsUrl: 'https://www.google.com/maps/dir//Superdévoluy,+France/@44.6833,6.0167,15z'
             }
         ];
 
+        let deferredPrompt;
+
+        // PWA Install functionality
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBanner').classList.add('show');
+        });
+
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                document.getElementById('installBanner').classList.remove('show');
+            }
+            deferredPrompt = null;
+        });
+
+        document.getElementById('closeBanner').addEventListener('click', () => {
+            document.getElementById('installBanner').classList.remove('show');
+        });
+
         async function fetchWeatherData(resort) {
             try {
-                // Open-Meteo API - gratis en geen API key nodig
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${resort.coords.lat}&longitude=${resort.coords.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,cloud_cover&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum&timezone=Europe/Berlin&forecast_days=7&past_days=7`;
+                // Open-Meteo API met UV index en zonuren
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${resort.coords.lat}&longitude=${resort.coords.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,cloud_cover&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum,uv_index_max,sunshine_duration&timezone=auto&forecast_days=7&past_days=14`;
                 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Weather data niet beschikbaar');
                 
                 const data = await response.json();
                 
-                // Sneeuwdiepte schatten op basis van sneeuwval en hoogte
-                const elevation = 1800; // Gemiddelde hoogte skigebied
-                const estimatedSnowDepth = Math.round(data.daily.snowfall_sum[7] * 10 + (elevation / 10));
+                // Sneeuwdiepte schatten op basis van hoogte en recente sneeuwval
+                const recentSnowfall = data.daily.snowfall_sum.slice(0, 14).reduce((a, b) => a + b, 0);
+                const estimatedSnowDepth = Math.round((recentSnowfall * 8) + (resort.elevation / 15));
                 
-                // Find last snowfall
+                // Find last snowfall in past 14 days
                 let lastSnowfallDate = null;
                 let lastSnowfallAmount = 0;
-                for (let i = 13; i >= 7; i--) { // Check last 7 days (past data)
-                    if (data.daily.snowfall_sum[i] > 0) {
+                for (let i = 13; i >= 0; i--) {
+                    if (data.daily.snowfall_sum[i] > 0.5) {
                         lastSnowfallDate = data.daily.time[i];
                         lastSnowfallAmount = data.daily.snowfall_sum[i];
                         break;
@@ -530,16 +767,18 @@
                     temperature: Math.round(data.current.temperature_2m),
                     humidity: data.current.relative_humidity_2m,
                     windSpeed: Math.round(data.current.wind_speed_10m),
-                    snowfall: data.daily.snowfall_sum[7] || 0,
+                    snowfall: Math.round(data.daily.snowfall_sum[14] * 10) / 10 || 0,
                     snowDepth: estimatedSnowDepth,
                     weatherCode: data.current.weather_code,
                     cloudCover: data.current.cloud_cover,
                     forecast: {
-                        time: data.daily.time.slice(7, 14),
-                        weather_code: data.daily.weather_code.slice(7, 14),
-                        temperature_2m_max: data.daily.temperature_2m_max.slice(7, 14),
-                        temperature_2m_min: data.daily.temperature_2m_min.slice(7, 14),
-                        snowfall_sum: data.daily.snowfall_sum.slice(7, 14)
+                        time: data.daily.time.slice(14, 21),
+                        weather_code: data.daily.weather_code.slice(14, 21),
+                        temperature_2m_max: data.daily.temperature_2m_max.slice(14, 21),
+                        temperature_2m_min: data.daily.temperature_2m_min.slice(14, 21),
+                        snowfall_sum: data.daily.snowfall_sum.slice(14, 21),
+                        uv_index_max: data.daily.uv_index_max.slice(14, 21),
+                        sunshine_duration: data.daily.sunshine_duration.slice(14, 21)
                     },
                     lastSnowfall: {
                         date: lastSnowfallDate,
@@ -573,40 +812,76 @@
 
         function getWeatherIcon(code) {
             const iconMap = {
-                0: '☀️',
-                1: '🌤️',
-                2: '⛅',
-                3: '☁️',
-                45: '🌫️',
-                48: '🌫️',
-                51: '🌧️',
-                61: '🌧️',
-                63: '🌧️',
-                65: '🌧️',
-                71: '🌨️',
-                73: '❄️',
-                75: '❄️',
-                77: '❄️',
-                80: '🌧️',
-                81: '🌧️',
-                82: '🌧️',
-                85: '🌨️',
-                86: '❄️',
-                95: '⛈️',
-                96: '⛈️',
-                99: '⛈️'
+                0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+                45: '🌫️', 48: '🌫️', 51: '🌧️', 61: '🌧️',
+                63: '🌧️', 65: '🌧️', 71: '🌨️', 73: '❄️',
+                75: '❄️', 77: '❄️', 80: '🌧️', 81: '🌧️',
+                82: '🌧️', 85: '🌨️', 86: '❄️', 95: '⛈️',
+                96: '⛈️', 99: '⛈️'
             };
             return iconMap[code] || '🌤️';
+        }
+
+        function getUVIndexText(uv) {
+            if (uv < 3) return `UV: ${Math.round(uv)} (Laag)`;
+            if (uv < 6) return `UV: ${Math.round(uv)} (Matig)`;
+            if (uv < 8) return `UV: ${Math.round(uv)} (Hoog)`;
+            return `UV: ${Math.round(uv)} (Zeer hoog)`;
+        }
+
+        function calculateFeelsLike(temp, windSpeed) {
+            // Wind chill berekening
+            if (temp <= 10 && windSpeed > 4.8) {
+                const windKmh = windSpeed;
+                const feelsLike = 13.12 + 0.6215 * temp - 11.37 * Math.pow(windKmh, 0.16) + 0.3965 * temp * Math.pow(windKmh, 0.16);
+                return Math.round(feelsLike);
+            }
+            return temp;
+        }
+
+        function getColdWarning(temp, windSpeed, elevation) {
+            const feelsLike = calculateFeelsLike(temp, windSpeed);
+            
+            if (feelsLike <= -10) {
+                return {
+                    show: true,
+                    level: 'extreme',
+                    title: '🥶 Extreem koud!',
+                    message: `Gevoelstemperatuur ${feelsLike}°C. Draag thermisch ondergoed, dikke jas, muts, sjaal en handschoenen. Bescherm je gezicht tegen bevriezing!`
+                };
+            } else if (feelsLike <= -5) {
+                return {
+                    show: true,
+                    level: 'high',
+                    title: '❄️ Zeer koud',
+                    message: `Gevoelstemperatuur ${feelsLike}°C. Draag warme kleding, handschoenen en een muts. Neem regelmatig pauzes in een verwarmde ruimte.`
+                };
+            } else if (feelsLike <= 0) {
+                return {
+                    show: true,
+                    level: 'moderate',
+                    title: '🧊 Koud',
+                    message: `Gevoelstemperatuur ${feelsLike}°C. Draag voldoende warme kleding en handschoenen.`
+                };
+            }
+            return { show: false };
         }
 
         function createResortCard(resort, weatherData) {
             if (!weatherData) {
                 return `
                     <div class="resort-card">
-                        <h2 class="resort-name">${resort.name}</h2>
-                        <p class="resort-location">${resort.location}</p>
-                        <div class="error">
-                            ⚠️ Weerdata tijdelijk niet beschikbaar
+                        <div class="resort-header">
+                            <div class="resort-header-content">
+                                <h2 class="resort-name">${resort.name}</h2>
+                                <p class="resort-location">${resort.location}</p>
+                            </div>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="resort-content">
+                            <div class="error">
+                                ⚠️ Weerdata tijdelijk niet beschikbaar
+                            </div>
                         </div>
                     </div>
                 `;
@@ -614,44 +889,65 @@
 
             const snowCondition = weatherData.snowDepth > 100 ? '🎿 Uitstekend' : 
                                  weatherData.snowDepth > 50 ? '⛷️ Goed' : 
-                                 '⚠️ Beperkt';
+                                 weatherData.snowDepth > 20 ? '⚠️ Matig' :
+                                 '❌ Beperkt';
 
-            // Last snowfall info
+            // Cold warning
+            const warning = getColdWarning(weatherData.temperature, weatherData.windSpeed, resort.elevation);
+            const warningHTML = warning.show ? `
+                <div class="weather-alert cold">
+                    <span class="alert-icon">❄️</span>
+                    <div class="alert-text">
+                        <h4>${warning.title}</h4>
+                        <p>${warning.message}</p>
+                    </div>
+                </div>
+            ` : '';
+
+            // Last snowfall
             let lastSnowfallHTML = '';
             if (weatherData.lastSnowfall.date) {
                 const snowDate = new Date(weatherData.lastSnowfall.date);
                 const today = new Date();
                 const diffTime = Math.abs(today - snowDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                 const dateStr = diffDays === 0 ? 'Vandaag' : 
                                diffDays === 1 ? 'Gisteren' : 
                                `${diffDays} dagen geleden`;
                 
                 lastSnowfallHTML = `
-                    <div class="last-snowfall">
-                        <div class="last-snowfall-label">❄️ Laatste Sneeuwval</div>
-                        <div class="last-snowfall-value">${Math.round(weatherData.lastSnowfall.amount)} cm</div>
-                        <div class="last-snowfall-date">${dateStr} (${snowDate.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' })})</div>
-                    </div>
-                `;
-            } else {
-                lastSnowfallHTML = `
-                    <div class="last-snowfall">
-                        <div class="last-snowfall-label">❄️ Laatste Sneeuwval</div>
-                        <div class="last-snowfall-value">Geen recente sneeuw</div>
-                        <div class="last-snowfall-date">Afgelopen 7 dagen</div>
+                    <div class="stat-item">
+                        <div class="stat-label">Laatste sneeuwval</div>
+                        <div class="stat-value">${Math.round(weatherData.lastSnowfall.amount * 10) / 10} cm</div>
+                        <div class="stat-label">${dateStr}</div>
                     </div>
                 `;
             }
 
+            // Estimate open lifts (based on season and conditions)
+            const month = new Date().getMonth();
+            const isHighSeason = month >= 11 || month <= 2;
+            const hasGoodSnow = weatherData.snowDepth > 50;
+            let estimatedLifts = '?';
+            
+            if (resort.name === 'Bergeralm') {
+                estimatedLifts = isHighSeason && hasGoodSnow ? '4-5' : '2-3';
+            } else if (resort.name === 'Ladurns') {
+                estimatedLifts = isHighSeason && hasGoodSnow ? '3-4' : '2-3';
+            } else if (resort.name === 'Superdévoluy') {
+                estimatedLifts = isHighSeason && hasGoodSnow ? '14-16' : '8-10';
+            }
+
             // Generate 7-day forecast
-            const forecastHTML = weatherData.forecast.time.slice(0, 7).map((date, index) => {
+            const forecastHTML = weatherData.forecast.time.map((date, index) => {
                 const dayName = new Date(date).toLocaleDateString('nl-NL', { weekday: 'short' });
                 const dayDate = new Date(date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
                 const maxTemp = Math.round(weatherData.forecast.temperature_2m_max[index]);
                 const minTemp = Math.round(weatherData.forecast.temperature_2m_min[index]);
-                const snow = weatherData.forecast.snowfall_sum[index] || 0;
+                const snow = Math.round(weatherData.forecast.snowfall_sum[index] * 10) / 10 || 0;
                 const icon = getWeatherIcon(weatherData.forecast.weather_code[index]);
+                const sunHours = Math.round(weatherData.forecast.sunshine_duration[index] / 3600 * 10) / 10;
+                const uv = weatherData.forecast.uv_index_max[index];
                 
                 return `
                     <div class="forecast-day">
@@ -659,82 +955,96 @@
                         <div class="forecast-icon">${icon}</div>
                         <div class="forecast-temp">${maxTemp}° / ${minTemp}°</div>
                         ${snow > 0 ? `<div class="forecast-snow">❄️ ${snow} cm</div>` : ''}
+                        <div class="forecast-sun">☀️ ${sunHours}u</div>
+                        <div class="forecast-uv">${getUVIndexText(uv)}</div>
                     </div>
                 `;
             }).join('');
 
             return `
-                <div class="resort-card">
-                    <h2 class="resort-name">${resort.name}</h2>
-                    <p class="resort-location">${resort.location}</p>
+                <div class="resort-card" data-resort="${resort.name}">
+                    <div class="resort-header" onclick="toggleResort('${resort.name}')">
+                        <div class="resort-header-content">
+                            <h2 class="resort-name">${resort.name}</h2>
+                            <p class="resort-location">${resort.location} • ${resort.elevation}m</p>
+                        </div>
+                        <span class="toggle-icon">▼</span>
+                    </div>
                     
-                    <div class="weather-section">
-                        <h3 class="section-title">❄️ Sneeuwcondities</h3>
-                        <div class="weather-grid">
-                            <div class="weather-item snow-depth">
-                                <div class="weather-label">Sneeuwdiepte (schatting)</div>
-                                <div class="weather-value">${weatherData.snowDepth} cm</div>
+                    <div class="resort-content">
+                        ${warningHTML}
+
+                        <div class="quick-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">Sneeuwdiepte (schatting)</div>
+                                <div class="stat-value">${weatherData.snowDepth} cm</div>
+                                <div class="stat-label" style="font-size: 0.7rem; margin-top: 3px;">Gebaseerd op weerdata</div>
                             </div>
-                            <div class="weather-item">
-                                <div class="weather-label">Verse sneeuw (24u)</div>
-                                <div class="weather-value">${weatherData.snowfall} cm</div>
+                            <div class="stat-item">
+                                <div class="stat-label">Conditie</div>
+                                <div class="stat-value" style="font-size: 1.2rem;">${snowCondition}</div>
                             </div>
-                            <div class="weather-item">
-                                <div class="weather-label">Conditie</div>
-                                <div class="weather-value" style="font-size: 1.3rem;">${snowCondition}</div>
+                            <div class="stat-item">
+                                <div class="stat-label">Open liften (schatting)</div>
+                                <div class="stat-value">${estimatedLifts}</div>
+                                <div class="stat-label" style="font-size: 0.7rem; margin-top: 3px;">Check officiële site</div>
+                            </div>
+                            ${lastSnowfallHTML}
+                        </div>
+                        
+                        <div class="weather-section">
+                            <h3 class="section-title">🌡️ Huidige Omstandigheden</h3>
+                            <div class="weather-grid">
+                                <div class="weather-item">
+                                    <div class="weather-label">Temperatuur</div>
+                                    <div class="weather-value">${weatherData.temperature}°C</div>
+                                </div>
+                                <div class="weather-item">
+                                    <div class="weather-label">Wind</div>
+                                    <div class="weather-value">${weatherData.windSpeed} km/u</div>
+                                </div>
+                                <div class="weather-item">
+                                    <div class="weather-label">Gevoelstemperatuur</div>
+                                    <div class="weather-value">${calculateFeelsLike(weatherData.temperature, weatherData.windSpeed)}°C</div>
+                                </div>
+                                <div class="weather-item">
+                                    <div class="weather-label">Weer</div>
+                                    <div class="weather-value" style="font-size: 1.3rem;">
+                                        ${getWeatherDescription(weatherData.weatherCode)}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        ${lastSnowfallHTML}
-                    </div>
 
-                    <div class="weather-section">
-                        <h3 class="section-title">🌡️ Huidige Omstandigheden</h3>
-                        <div class="weather-grid">
-                            <div class="weather-item">
-                                <div class="weather-label">Temperatuur</div>
-                                <div class="weather-value">${weatherData.temperature}°C</div>
-                            </div>
-                            <div class="weather-item">
-                                <div class="weather-label">Wind</div>
-                                <div class="weather-value">${weatherData.windSpeed} km/u</div>
-                            </div>
-                            <div class="weather-item">
-                                <div class="weather-label">Vochtigheid</div>
-                                <div class="weather-value">${weatherData.humidity}%</div>
-                            </div>
-                            <div class="weather-item">
-                                <div class="weather-label">Bewolking</div>
-                                <div class="weather-value">${weatherData.cloudCover}%</div>
+                        <div class="forecast-section">
+                            <h3 class="section-title">📅 7-Daagse Voorspelling</h3>
+                            <div class="forecast-grid">
+                                ${forecastHTML}
                             </div>
                         </div>
-                    </div>
 
-                    <div class="weather-section">
-                        <div class="weather-item">
-                            <div class="weather-label">Nu</div>
-                            <div class="weather-value" style="font-size: 1.3rem;">
-                                ${getWeatherDescription(weatherData.weatherCode)}
-                            </div>
+                        <div class="action-buttons">
+                            <a href="${resort.officialUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                                🏔️ Officiële Website
+                            </a>
+                            <a href="${resort.pisteMapUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                                🗺️ Pistekaart
+                            </a>
+                            <a href="${resort.webcamUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                                📷 Webcam
+                            </a>
+                            <a href="${resort.mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-tertiary">
+                                🧭 Routebeschrijving
+                            </a>
                         </div>
-                    </div>
-
-                    <div class="forecast-section">
-                        <h3 class="section-title">📅 7-Daagse Voorspelling</h3>
-                        <div class="forecast-grid">
-                            ${forecastHTML}
-                        </div>
-                    </div>
-
-                    <div class="piste-map-section">
-                        <a href="${resort.pisteMapUrl}" target="_blank" rel="noopener noreferrer" class="piste-map-btn">
-                            🗺️ Pistekaart
-                        </a>
-                        <a href="${resort.webcamUrl}" target="_blank" rel="noopener noreferrer" class="webcam-btn">
-                            📷 Webcam
-                        </a>
                     </div>
                 </div>
             `;
+        }
+
+        function toggleResort(resortName) {
+            const card = document.querySelector(`[data-resort="${resortName}"]`);
+            card.classList.toggle('collapsed');
         }
 
         async function loadAllResorts() {
@@ -748,31 +1058,34 @@
                     createResortCard(resort, weatherDataArray[index])
                 ).join('');
                 
+                const now = new Date();
                 document.getElementById('lastUpdate').textContent = 
-                    `Laatst bijgewerkt: ${new Date().toLocaleString('nl-NL')}`;
+                    `Laatst bijgewerkt: ${now.toLocaleString('nl-NL')} • Volgende update: ${new Date(now.getTime() + 15 * 60000).toLocaleTimeString('nl-NL')}`;
             } catch (error) {
                 container.innerHTML = `
                     <div class="resort-card">
-                        <div class="error">
-                            ⚠️ Er is een fout opgetreden bij het laden van de data. Probeer het later opnieuw.
+                        <div class="resort-content">
+                            <div class="error">
+                                ⚠️ Er is een fout opgetreden bij het laden van de data. Probeer het later opnieuw.
+                            </div>
                         </div>
                     </div>
                 `;
             }
         }
 
-        // Service Worker registratie voor PWA
+        // Service Worker registratie
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/wintersport/sw.js', { scope: '/wintersport/' }).catch(err => {
                 console.log('Service Worker registratie mislukt:', err);
             });
         }
 
-        // Load data on page load
+        // Initial load
         loadAllResorts();
 
-        // Refresh elke 10 minuten
-        setInterval(loadAllResorts, 600000);
+        // Refresh elke 15 minuten (900000 ms)
+        setInterval(loadAllResorts, 900000);
     </script>
 </body>
 </html>
