@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ski Conditions - Alpen</title>
-    <meta name="description" content="Actuele ski-condities voor Bergeralm, Ladurns en Matrei">
+    <meta name="description" content="Actuele ski-condities voor Bergeralm, Ladurns en Superdévoluy">
+    <base href="/wintersport/">
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='80'>⛷️</text></svg>">
     <meta name="theme-color" content="#0a1929">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +32,7 @@
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a3a52 100%);
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a3a52 50%, #0d2438 100%);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
@@ -45,10 +47,46 @@
             right: 0;
             bottom: 0;
             background-image: 
-                radial-gradient(circle at 20% 50%, rgba(51, 153, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(0, 229, 255, 0.1) 0%, transparent 50%);
+                radial-gradient(circle at 20% 30%, rgba(51, 153, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(0, 229, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 40%);
             pointer-events: none;
             z-index: 0;
+            animation: bgPulse 15s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Animated snowflakes */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -10px;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20% 30%, white, transparent),
+                radial-gradient(2px 2px at 60% 70%, white, transparent),
+                radial-gradient(1px 1px at 50% 50%, white, transparent),
+                radial-gradient(1px 1px at 80% 10%, white, transparent),
+                radial-gradient(2px 2px at 90% 60%, white, transparent),
+                radial-gradient(1px 1px at 33% 80%, white, transparent),
+                radial-gradient(2px 2px at 15% 90%, white, transparent);
+            background-size: 200% 200%;
+            background-position: 0% 0%;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+            animation: snowfall 20s linear infinite;
+        }
+
+        @keyframes snowfall {
+            0% { background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
+            100% { background-position: 100% 100%, -100% 100%, 50% 100%, -50% 100%, 100% 50%, -100% 150%, 50% 150%; }
         }
 
         .container {
@@ -288,6 +326,7 @@
             font-weight: 600;
             font-size: 1rem;
             margin-top: 15px;
+            margin-right: 10px;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
@@ -298,11 +337,59 @@
             box-shadow: 0 10px 30px rgba(0, 229, 255, 0.3);
         }
 
+        .webcam-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .webcam-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(238, 90, 111, 0.4);
+        }
+
         .piste-map-section {
             margin-top: 20px;
             text-align: center;
             padding-top: 20px;
             border-top: 1px solid var(--frost);
+        }
+
+        .last-snowfall {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(51, 153, 255, 0.15));
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .last-snowfall-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .last-snowfall-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .last-snowfall-date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            font-weight: 300;
         }
 
         .error {
@@ -395,26 +482,29 @@
                 name: 'Bergeralm',
                 location: 'Steinach am Brenner, Oostenrijk',
                 coords: { lat: 47.0858, lon: 11.4650 },
-                pisteMapUrl: 'https://www.bergeralm.at/winter/pistenplan'
+                pisteMapUrl: 'https://www.bergeralm.net/en/slopes-and-more/',
+                webcamUrl: 'https://www.foto-webcam.eu/webcam/bergeralm/'
             },
             {
                 name: 'Ladurns',
                 location: 'Zuid-Tirol, Italië',
                 coords: { lat: 46.8833, lon: 11.4500 },
-                pisteMapUrl: 'https://www.ladurns.it/nl/winter/pistenplan'
+                pisteMapUrl: 'https://www.ladurns.it/media/files/downloads/Ladurns_Winter_Druck_klein_1.pdf',
+                webcamUrl: 'https://www.ladurns.it/nl/winter/webcam'
             },
             {
                 name: 'Superdévoluy',
                 location: 'Hautes-Alpes, Frankrijk',
                 coords: { lat: 44.6833, lon: 6.0167 },
-                pisteMapUrl: 'https://www.superdevoluy.com/en/ski-area/piste-map/'
+                pisteMapUrl: 'https://www.ledevoluy.com/winter/skiing-and-snowboarding/trail-map/',
+                webcamUrl: 'https://www.ledevoluy.com/practical-information/webcams/'
             }
         ];
 
         async function fetchWeatherData(resort) {
             try {
                 // Open-Meteo API - gratis en geen API key nodig
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${resort.coords.lat}&longitude=${resort.coords.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,cloud_cover&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum&timezone=Europe/Berlin&forecast_days=7`;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${resort.coords.lat}&longitude=${resort.coords.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,cloud_cover&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum&timezone=Europe/Berlin&forecast_days=7&past_days=7`;
                 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Weather data niet beschikbaar');
@@ -423,17 +513,38 @@
                 
                 // Sneeuwdiepte schatten op basis van sneeuwval en hoogte
                 const elevation = 1800; // Gemiddelde hoogte skigebied
-                const estimatedSnowDepth = Math.round(data.daily.snowfall_sum[0] * 10 + (elevation / 10));
+                const estimatedSnowDepth = Math.round(data.daily.snowfall_sum[7] * 10 + (elevation / 10));
+                
+                // Find last snowfall
+                let lastSnowfallDate = null;
+                let lastSnowfallAmount = 0;
+                for (let i = 13; i >= 7; i--) { // Check last 7 days (past data)
+                    if (data.daily.snowfall_sum[i] > 0) {
+                        lastSnowfallDate = data.daily.time[i];
+                        lastSnowfallAmount = data.daily.snowfall_sum[i];
+                        break;
+                    }
+                }
                 
                 return {
                     temperature: Math.round(data.current.temperature_2m),
                     humidity: data.current.relative_humidity_2m,
                     windSpeed: Math.round(data.current.wind_speed_10m),
-                    snowfall: data.daily.snowfall_sum[0] || 0,
+                    snowfall: data.daily.snowfall_sum[7] || 0,
                     snowDepth: estimatedSnowDepth,
                     weatherCode: data.current.weather_code,
                     cloudCover: data.current.cloud_cover,
-                    forecast: data.daily
+                    forecast: {
+                        time: data.daily.time.slice(7, 14),
+                        weather_code: data.daily.weather_code.slice(7, 14),
+                        temperature_2m_max: data.daily.temperature_2m_max.slice(7, 14),
+                        temperature_2m_min: data.daily.temperature_2m_min.slice(7, 14),
+                        snowfall_sum: data.daily.snowfall_sum.slice(7, 14)
+                    },
+                    lastSnowfall: {
+                        date: lastSnowfallDate,
+                        amount: lastSnowfallAmount
+                    }
                 };
             } catch (error) {
                 console.error(`Error fetching data for ${resort.name}:`, error);
@@ -505,6 +616,34 @@
                                  weatherData.snowDepth > 50 ? '⛷️ Goed' : 
                                  '⚠️ Beperkt';
 
+            // Last snowfall info
+            let lastSnowfallHTML = '';
+            if (weatherData.lastSnowfall.date) {
+                const snowDate = new Date(weatherData.lastSnowfall.date);
+                const today = new Date();
+                const diffTime = Math.abs(today - snowDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const dateStr = diffDays === 0 ? 'Vandaag' : 
+                               diffDays === 1 ? 'Gisteren' : 
+                               `${diffDays} dagen geleden`;
+                
+                lastSnowfallHTML = `
+                    <div class="last-snowfall">
+                        <div class="last-snowfall-label">❄️ Laatste Sneeuwval</div>
+                        <div class="last-snowfall-value">${Math.round(weatherData.lastSnowfall.amount)} cm</div>
+                        <div class="last-snowfall-date">${dateStr} (${snowDate.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' })})</div>
+                    </div>
+                `;
+            } else {
+                lastSnowfallHTML = `
+                    <div class="last-snowfall">
+                        <div class="last-snowfall-label">❄️ Laatste Sneeuwval</div>
+                        <div class="last-snowfall-value">Geen recente sneeuw</div>
+                        <div class="last-snowfall-date">Afgelopen 7 dagen</div>
+                    </div>
+                `;
+            }
+
             // Generate 7-day forecast
             const forecastHTML = weatherData.forecast.time.slice(0, 7).map((date, index) => {
                 const dayName = new Date(date).toLocaleDateString('nl-NL', { weekday: 'short' });
@@ -545,6 +684,7 @@
                                 <div class="weather-value" style="font-size: 1.3rem;">${snowCondition}</div>
                             </div>
                         </div>
+                        ${lastSnowfallHTML}
                     </div>
 
                     <div class="weather-section">
@@ -587,7 +727,10 @@
 
                     <div class="piste-map-section">
                         <a href="${resort.pisteMapUrl}" target="_blank" rel="noopener noreferrer" class="piste-map-btn">
-                            🗺️ Bekijk Pistekaart
+                            🗺️ Pistekaart
+                        </a>
+                        <a href="${resort.webcamUrl}" target="_blank" rel="noopener noreferrer" class="webcam-btn">
+                            📷 Webcam
                         </a>
                     </div>
                 </div>
@@ -620,7 +763,7 @@
 
         // Service Worker registratie voor PWA
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => {
+            navigator.serviceWorker.register('/wintersport/sw.js', { scope: '/wintersport/' }).catch(err => {
                 console.log('Service Worker registratie mislukt:', err);
             });
         }

@@ -1,8 +1,8 @@
 const CACHE_NAME = 'ski-conditions-v1';
 const urlsToCache = [
-  '/',
-  '/ski-conditions-pwa.html',
-  '/manifest.json'
+  '/wintersport/',
+  '/wintersport/index.html',
+  '/wintersport/manifest.json'
 ];
 
 // Install event - cache belangrijke bestanden

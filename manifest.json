@@ -1,8 +1,9 @@
 {
   "name": "Ski Conditions Alpen",
   "short_name": "SkiAlpen",
-  "description": "Actuele ski-condities voor Bergeralm, Ladurns en Matrei",
-  "start_url": "/",
+  "description": "Actuele ski-condities voor Bergeralm, Ladurns en Superdévoluy",
+  "start_url": "/wintersport/",
+  "scope": "/wintersport/",
   "display": "standalone",
   "background_color": "#0a1929",
   "theme_color": "#0a1929",
