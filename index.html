@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -680,6 +681,25 @@
     </div>
 
     <script>
+        // ========================================
+        // SUPABASE SETUP (OPTIONEEL)
+        // ========================================
+        // Als je de scraper hebt opgezet (zie SCRAPER-SETUP.md),
+        // vul dan hier je Supabase credentials in voor accurate sneeuwdata:
+        
+        const SUPABASE_URL = ''; // Bijv: 'https://abcdefgh.supabase.co'
+        const SUPABASE_KEY = ''; // Je anon public key
+        
+        let supabase = null;
+        if (SUPABASE_URL && SUPABASE_KEY && window.supabase) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('✅ Supabase connected - using real snow data!');
+        } else {
+            console.log('⚠️ Supabase not configured - using estimated data');
+        }
+        
+        // ========================================
+        
         const RESORTS = [
             {
                 name: 'Bergeralm',
@@ -714,33 +734,103 @@
         ];
 
         let deferredPrompt;
+        let isStandalone = false;
+
+        // Check if already installed
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            isStandalone = true;
+        }
+
+        // Show banner on iOS (Safari doesn't support beforeinstallprompt)
+        function checkMobile() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isAndroid = /Android/.test(navigator.userAgent);
+            
+            if ((isIOS || isAndroid) && !isStandalone) {
+                // Show banner after 2 seconds on mobile
+                setTimeout(() => {
+                    const banner = document.getElementById('installBanner');
+                    if (!sessionStorage.getItem('installBannerClosed')) {
+                        banner.classList.add('show');
+                    }
+                }, 2000);
+            }
+        }
 
         // PWA Install functionality
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            document.getElementById('installBanner').classList.add('show');
+            if (!sessionStorage.getItem('installBannerClosed')) {
+                document.getElementById('installBanner').classList.add('show');
+            }
         });
 
         document.getElementById('installBtn').addEventListener('click', async () => {
-            if (!deferredPrompt) return;
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            
-            if (outcome === 'accepted') {
-                document.getElementById('installBanner').classList.remove('show');
+            if (isIOS) {
+                // Show iOS-specific instructions
+                alert('Op iOS: Tik op het "Deel" icoon (□↑) onderaan je scherm en kies "Zet op beginscherm"');
+            } else if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    document.getElementById('installBanner').classList.remove('show');
+                    sessionStorage.setItem('installBannerClosed', 'true');
+                }
+                deferredPrompt = null;
+            } else {
+                alert('Om te installeren: open het menu van je browser en kies "Installeer app" of "Voeg toe aan startscherm"');
             }
-            deferredPrompt = null;
         });
 
         document.getElementById('closeBanner').addEventListener('click', () => {
             document.getElementById('installBanner').classList.remove('show');
+            sessionStorage.setItem('installBannerClosed', 'true');
         });
+
+        // Check on load
+        checkMobile();
+
+        // ========================================
+        // SUPABASE DATA FETCHING
+        // ========================================
+        async function fetchRealSnowData(resortName) {
+            if (!supabase) return null;
+            
+            try {
+                const { data, error } = await supabase
+                    .from('snow_data')
+                    .select('*')
+                    .eq('resort', resortName)
+                    .single();
+                
+                if (error) throw error;
+                
+                return {
+                    snowDepth: data.snow_depth || null,
+                    openLifts: data.open_lifts || null,
+                    totalLifts: data.total_lifts || null,
+                    lastSnowfall: data.last_snowfall || null,
+                    lastSnowfallAmount: data.last_snowfall_amount || null,
+                    condition: data.condition || null,
+                    source: data.source || 'supabase',
+                    updatedAt: data.updated_at
+                };
+            } catch (error) {
+                console.error(`Error fetching snow data for ${resortName}:`, error);
+                return null;
+            }
+        }
 
         async function fetchWeatherData(resort) {
             try {
-                // Open-Meteo API met UV index en zonuren
+                // Fetch real snow data from Supabase (if available)
+                const realSnowData = await fetchRealSnowData(resort.name);
+                
+                // Fetch weather forecast from Open-Meteo
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${resort.coords.lat}&longitude=${resort.coords.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,cloud_cover&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum,uv_index_max,sunshine_duration&timezone=auto&forecast_days=7&past_days=14`;
                 
                 const response = await fetch(url);
@@ -748,19 +838,48 @@
                 
                 const data = await response.json();
                 
-                // Sneeuwdiepte schatten op basis van hoogte en recente sneeuwval
-                const recentSnowfall = data.daily.snowfall_sum.slice(0, 14).reduce((a, b) => a + b, 0);
-                const estimatedSnowDepth = Math.round((recentSnowfall * 8) + (resort.elevation / 15));
+                // Use REAL snow data if available, otherwise estimate
+                let snowDepth, openLifts, totalLifts, lastSnowfallDate, lastSnowfallAmount;
                 
-                // Find last snowfall in past 14 days
-                let lastSnowfallDate = null;
-                let lastSnowfallAmount = 0;
-                for (let i = 13; i >= 0; i--) {
-                    if (data.daily.snowfall_sum[i] > 0.5) {
-                        lastSnowfallDate = data.daily.time[i];
-                        lastSnowfallAmount = data.daily.snowfall_sum[i];
-                        break;
+                if (realSnowData && realSnowData.snowDepth) {
+                    // ✅ REAL DATA FROM SUPABASE
+                    snowDepth = realSnowData.snowDepth;
+                    openLifts = realSnowData.openLifts;
+                    totalLifts = realSnowData.totalLifts;
+                    lastSnowfallDate = realSnowData.lastSnowfall;
+                    lastSnowfallAmount = realSnowData.lastSnowfallAmount;
+                    console.log(`✅ Using REAL data for ${resort.name} from ${realSnowData.source}`);
+                } else {
+                    // ⚠️ ESTIMATED DATA
+                    const recentSnowfall = data.daily.snowfall_sum.slice(0, 14).reduce((a, b) => a + b, 0);
+                    snowDepth = Math.round((recentSnowfall * 8) + (resort.elevation / 15));
+                    
+                    // Find last snowfall in past 14 days
+                    for (let i = 13; i >= 0; i--) {
+                        if (data.daily.snowfall_sum[i] > 0.5) {
+                            lastSnowfallDate = data.daily.time[i];
+                            lastSnowfallAmount = data.daily.snowfall_sum[i];
+                            break;
+                        }
                     }
+                    
+                    // Estimate lifts
+                    const month = new Date().getMonth();
+                    const isHighSeason = month >= 11 || month <= 2;
+                    const hasGoodSnow = snowDepth > 50;
+                    
+                    if (resort.name === 'Bergeralm') {
+                        openLifts = isHighSeason && hasGoodSnow ? 4 : 2;
+                        totalLifts = 5;
+                    } else if (resort.name === 'Ladurns') {
+                        openLifts = isHighSeason && hasGoodSnow ? 3 : 2;
+                        totalLifts = 4;
+                    } else if (resort.name === 'Superdévoluy') {
+                        openLifts = isHighSeason && hasGoodSnow ? 14 : 8;
+                        totalLifts = 16;
+                    }
+                    
+                    console.log(`⚠️ Using ESTIMATED data for ${resort.name}`);
                 }
                 
                 return {
@@ -768,7 +887,9 @@
                     humidity: data.current.relative_humidity_2m,
                     windSpeed: Math.round(data.current.wind_speed_10m),
                     snowfall: Math.round(data.daily.snowfall_sum[14] * 10) / 10 || 0,
-                    snowDepth: estimatedSnowDepth,
+                    snowDepth: snowDepth,
+                    openLifts: openLifts,
+                    totalLifts: totalLifts,
                     weatherCode: data.current.weather_code,
                     cloudCover: data.current.cloud_cover,
                     forecast: {
@@ -783,7 +904,8 @@
                     lastSnowfall: {
                         date: lastSnowfallDate,
                         amount: lastSnowfallAmount
-                    }
+                    },
+                    dataSource: realSnowData ? 'real' : 'estimated'
                 };
             } catch (error) {
                 console.error(`Error fetching data for ${resort.name}:`, error);
@@ -928,15 +1050,24 @@
             const month = new Date().getMonth();
             const isHighSeason = month >= 11 || month <= 2;
             const hasGoodSnow = weatherData.snowDepth > 50;
-            let estimatedLifts = '?';
+            let estimatedLifts = weatherData.openLifts && weatherData.totalLifts 
+                ? `${weatherData.openLifts}/${weatherData.totalLifts}`
+                : '?';
             
-            if (resort.name === 'Bergeralm') {
-                estimatedLifts = isHighSeason && hasGoodSnow ? '4-5' : '2-3';
-            } else if (resort.name === 'Ladurns') {
-                estimatedLifts = isHighSeason && hasGoodSnow ? '3-4' : '2-3';
-            } else if (resort.name === 'Superdévoluy') {
-                estimatedLifts = isHighSeason && hasGoodSnow ? '14-16' : '8-10';
+            // Only estimate if we don't have real data
+            if (!weatherData.openLifts) {
+                if (resort.name === 'Bergeralm') {
+                    estimatedLifts = isHighSeason && hasGoodSnow ? '4-5/5' : '2-3/5';
+                } else if (resort.name === 'Ladurns') {
+                    estimatedLifts = isHighSeason && hasGoodSnow ? '3-4/4' : '2-3/4';
+                } else if (resort.name === 'Superdévoluy') {
+                    estimatedLifts = isHighSeason && hasGoodSnow ? '14-16/16' : '8-10/16';
+                }
             }
+            
+            const dataSourceBadge = weatherData.dataSource === 'real' 
+                ? '<span style="color: #4caf50; font-size: 0.7rem;">✓ Real data</span>'
+                : '<span style="color: #ff9800; font-size: 0.7rem;">⚠ Schatting</span>';
 
             // Generate 7-day forecast
             const forecastHTML = weatherData.forecast.time.map((date, index) => {
@@ -976,18 +1107,16 @@
 
                         <div class="quick-stats">
                             <div class="stat-item">
-                                <div class="stat-label">Sneeuwdiepte (schatting)</div>
+                                <div class="stat-label">Sneeuwdiepte ${dataSourceBadge}</div>
                                 <div class="stat-value">${weatherData.snowDepth} cm</div>
-                                <div class="stat-label" style="font-size: 0.7rem; margin-top: 3px;">Gebaseerd op weerdata</div>
                             </div>
                             <div class="stat-item">
                                 <div class="stat-label">Conditie</div>
                                 <div class="stat-value" style="font-size: 1.2rem;">${snowCondition}</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-label">Open liften (schatting)</div>
+                                <div class="stat-label">Open liften ${dataSourceBadge}</div>
                                 <div class="stat-value">${estimatedLifts}</div>
-                                <div class="stat-label" style="font-size: 0.7rem; margin-top: 3px;">Check officiële site</div>
                             </div>
                             ${lastSnowfallHTML}
                         </div>

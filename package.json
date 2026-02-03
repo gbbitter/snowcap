@@ -1,0 +1,19 @@
+{
+  "name": "ski-snow-scraper",
+  "version": "1.0.0",
+  "description": "Daily scraper for accurate ski resort snow data",
+  "type": "module",
+  "main": "snow-data-scraper.js",
+  "scripts": {
+    "scrape": "node snow-data-scraper.js",
+    "test": "node snow-data-scraper.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "cheerio": "^1.0.0-rc.12",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0"
+  }
+}
