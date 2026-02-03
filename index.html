@@ -225,6 +225,86 @@
             background-clip: text;
         }
 
+        .forecast-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid var(--frost);
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .forecast-day {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 8px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .forecast-day:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(0, 229, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .forecast-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 300;
+        }
+
+        .forecast-icon {
+            font-size: 1.8rem;
+            margin: 8px 0;
+        }
+
+        .forecast-temp {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--snow-white);
+            margin: 5px 0;
+        }
+
+        .forecast-snow {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            margin-top: 5px;
+        }
+
+        .piste-map-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .piste-map-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.3);
+        }
+
+        .piste-map-section {
+            margin-top: 20px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--frost);
+        }
+
         .error {
             background: rgba(255, 82, 82, 0.1);
             border: 1px solid rgba(255, 82, 82, 0.3);
@@ -314,24 +394,27 @@
             {
                 name: 'Bergeralm',
                 location: 'Steinach am Brenner, Oostenrijk',
-                coords: { lat: 47.0858, lon: 11.4650 }
+                coords: { lat: 47.0858, lon: 11.4650 },
+                pisteMapUrl: 'https://www.bergeralm.at/winter/pistenplan'
             },
             {
                 name: 'Ladurns',
                 location: 'Zuid-Tirol, Italië',
-                coords: { lat: 46.8833, lon: 11.4500 }
+                coords: { lat: 46.8833, lon: 11.4500 },
+                pisteMapUrl: 'https://www.ladurns.it/nl/winter/pistenplan'
             },
             {
                 name: 'Superdévoluy',
                 location: 'Hautes-Alpes, Frankrijk',
-                coords: { lat: 44.6833, lon: 6.0167 }
+                coords: { lat: 44.6833, lon: 6.0167 },
+                pisteMapUrl: 'https://www.superdevoluy.com/en/ski-area/piste-map/'
             }
         ];
 
         async function fetchWeatherData(resort) {
             try {
                 // Open-Meteo API - gratis en geen API key nodig
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${resort.coords.lat}&longitude=${resort.coords.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,cloud_cover&daily=snowfall_sum&timezone=Europe/Berlin`;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${resort.coords.lat}&longitude=${resort.coords.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,cloud_cover&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum&timezone=Europe/Berlin&forecast_days=7`;
                 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Weather data niet beschikbaar');
@@ -349,7 +432,8 @@
                     snowfall: data.daily.snowfall_sum[0] || 0,
                     snowDepth: estimatedSnowDepth,
                     weatherCode: data.current.weather_code,
-                    cloudCover: data.current.cloud_cover
+                    cloudCover: data.current.cloud_cover,
+                    forecast: data.daily
                 };
             } catch (error) {
                 console.error(`Error fetching data for ${resort.name}:`, error);
@@ -376,6 +460,34 @@
             return weatherCodes[code] || '🌤️ Wisselend';
         }
 
+        function getWeatherIcon(code) {
+            const iconMap = {
+                0: '☀️',
+                1: '🌤️',
+                2: '⛅',
+                3: '☁️',
+                45: '🌫️',
+                48: '🌫️',
+                51: '🌧️',
+                61: '🌧️',
+                63: '🌧️',
+                65: '🌧️',
+                71: '🌨️',
+                73: '❄️',
+                75: '❄️',
+                77: '❄️',
+                80: '🌧️',
+                81: '🌧️',
+                82: '🌧️',
+                85: '🌨️',
+                86: '❄️',
+                95: '⛈️',
+                96: '⛈️',
+                99: '⛈️'
+            };
+            return iconMap[code] || '🌤️';
+        }
+
         function createResortCard(resort, weatherData) {
             if (!weatherData) {
                 return `
@@ -392,6 +504,25 @@
             const snowCondition = weatherData.snowDepth > 100 ? '🎿 Uitstekend' : 
                                  weatherData.snowDepth > 50 ? '⛷️ Goed' : 
                                  '⚠️ Beperkt';
+
+            // Generate 7-day forecast
+            const forecastHTML = weatherData.forecast.time.slice(0, 7).map((date, index) => {
+                const dayName = new Date(date).toLocaleDateString('nl-NL', { weekday: 'short' });
+                const dayDate = new Date(date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+                const maxTemp = Math.round(weatherData.forecast.temperature_2m_max[index]);
+                const minTemp = Math.round(weatherData.forecast.temperature_2m_min[index]);
+                const snow = weatherData.forecast.snowfall_sum[index] || 0;
+                const icon = getWeatherIcon(weatherData.forecast.weather_code[index]);
+                
+                return `
+                    <div class="forecast-day">
+                        <div class="forecast-date">${dayName}<br>${dayDate}</div>
+                        <div class="forecast-icon">${icon}</div>
+                        <div class="forecast-temp">${maxTemp}° / ${minTemp}°</div>
+                        ${snow > 0 ? `<div class="forecast-snow">❄️ ${snow} cm</div>` : ''}
+                    </div>
+                `;
+            }).join('');
 
             return `
                 <div class="resort-card">
@@ -417,7 +548,7 @@
                     </div>
 
                     <div class="weather-section">
-                        <h3 class="section-title">🌡️ Weersomstandigheden</h3>
+                        <h3 class="section-title">🌡️ Huidige Omstandigheden</h3>
                         <div class="weather-grid">
                             <div class="weather-item">
                                 <div class="weather-label">Temperatuur</div>
@@ -440,11 +571,24 @@
 
                     <div class="weather-section">
                         <div class="weather-item">
-                            <div class="weather-label">Huidige situatie</div>
+                            <div class="weather-label">Nu</div>
                             <div class="weather-value" style="font-size: 1.3rem;">
                                 ${getWeatherDescription(weatherData.weatherCode)}
                             </div>
                         </div>
+                    </div>
+
+                    <div class="forecast-section">
+                        <h3 class="section-title">📅 7-Daagse Voorspelling</h3>
+                        <div class="forecast-grid">
+                            ${forecastHTML}
+                        </div>
+                    </div>
+
+                    <div class="piste-map-section">
+                        <a href="${resort.pisteMapUrl}" target="_blank" rel="noopener noreferrer" class="piste-map-btn">
+                            🗺️ Bekijk Pistekaart
+                        </a>
                     </div>
                 </div>
             `;

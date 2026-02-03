@@ -5,12 +5,14 @@ Een Progressive Web App die actuele weersomstandigheden en sneeuwcondities toont
 ## 🎿 Gebieden
 
 - **Bergeralm** - Steinach am Brenner, Oostenrijk
-- **Ladurns** - Zuid-Tirol, Italië  
-- **Matrei** - Oostenrijk
+- **Ladurns** - Zuid-Tirol, Italië
+- **Superdévoluy** - Hautes-Alpes, Frankrijk
 
 ## 🌟 Features
 
 - ✅ Real-time weerdata via Open-Meteo API (gratis, geen API key nodig)
+- ✅ **7-daagse weersverwachting** met temperatuur en sneeuwval
+- ✅ **Directe links naar pistekaarten** per skigebied
 - ✅ Sneeuwdiepte schattingen
 - ✅ Verse sneeuwval (24u)
 - ✅ Temperatuur, wind, luchtvochtigheid
