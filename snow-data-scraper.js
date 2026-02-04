@@ -6,8 +6,8 @@ import { createClient } from '@supabase/supabase-js';
 import * as cheerio from 'cheerio';
 
 // Supabase setup - VERVANG MET JOUW CREDENTIALS
-const supabaseUrl = 'YOUR_SUPABASE_URL';
-const supabaseKey = 'YOUR_SUPABASE_KEY';
+const supabaseUrl = 'https://rdntfxxdizqkizgexxvn.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkbnRmeHhkaXpxa2l6Z2V4eHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxODYzMzMsImV4cCI6MjA4NTc2MjMzM30.bypoqmBjF7s3dABJDryLvgqtW5MDbnoFluT8ig07O9k';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const RESORTS = [
